@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Generation.Processors.Biomes
 {
     [System.Serializable]
-    public class MountainBiome : IBiomeGenerator
+    public class MountainBiome : BiomeGenerator
     {
         public CreateChunkJob jobData        { get; set; }
         public BiomeProcessor biomeProcessor { get; set; }
@@ -23,7 +23,7 @@ namespace Generation.Processors.Biomes
         private float _continentalnessMulti;
             
 
-        public IBiomeGenerator CreateInstance(CreateChunkJob job, BiomeProcessor biomeProcessor)
+        public BiomeGenerator CreateInstance(CreateChunkJob job, BiomeProcessor biomeProcessor)
         {
             System.Random random = new (job.seed);
             
@@ -47,13 +47,13 @@ namespace Generation.Processors.Biomes
         }
 
 
-        public int SampleMapPoint(int x, int z)
+        public override int SampleMapPoint(int x, int z)
         {
             return (int)(SampleContinentalnessHeight(x,z) + biomeProcessor.baseHeight + _sampler.Sample(x, z));
         }
 
 
-        public BlockId SampleBlock(int x, int y, int z, int heightValue)
+        public override BlockId SampleBlock(int x, int y, int z, int heightValue)
         {
             return y > heightValue ? BlockId.Air : BlockId.Stone;
         }

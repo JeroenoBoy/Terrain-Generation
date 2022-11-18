@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Generation.Processors.Biomes
 {
     [System.Serializable]
-    public class PlainsBiome : IBiomeGenerator
+    public class PlainsBiome : BiomeGenerator
     {
         public CreateChunkJob jobData        { get; set; }
         public BiomeProcessor biomeProcessor { get; set; }
@@ -18,7 +18,7 @@ namespace Generation.Processors.Biomes
         private OctavesSampler    _sampler;
         
 
-        public IBiomeGenerator CreateInstance(CreateChunkJob job, BiomeProcessor biomeProcessor)
+        public BiomeGenerator CreateInstance(CreateChunkJob job, BiomeProcessor biomeProcessor)
         {
             System.Random random = new (job.seed);
             
@@ -32,13 +32,13 @@ namespace Generation.Processors.Biomes
         }
 
 
-        public int SampleMapPoint(int x, int z)
+        public override int SampleMapPoint(int x, int z)
         {
             return (int)(biomeProcessor.baseHeight + _sampler.Sample(x, z));
         }
 
 
-        public BlockId SampleBlock(int x, int y, int z, int heightValue)
+        public override BlockId SampleBlock(int x, int y, int z, int heightValue)
         {
             if (y > heightValue) return BlockId.Air;
             if (y == heightValue) return BlockId.Grass;

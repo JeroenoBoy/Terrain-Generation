@@ -460,7 +460,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1524428816}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 352.6, y: 70, z: 815.8}
+  m_LocalPosition: {x: 305.7, y: 70, z: 835.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -642,6 +642,8 @@ MonoBehaviour:
     _mountainStart: 0
     _smoothing: 0
     _baseHeight: 0
+    _smoothingFrequency: 0
+    _smoothingScale: 0
   _caveProcessor:
     _bubbleCaves:
       _enabled: 0
@@ -698,6 +700,8 @@ MonoBehaviour:
     _mountainStart: 0
     _smoothing: 0
     _baseHeight: 0
+    _smoothingFrequency: 0
+    _smoothingScale: 0
   _caveProcessor:
     _bubbleCaves:
       _enabled: 1
@@ -882,7 +886,7 @@ MonoBehaviour:
   _chunkHolder: {fileID: 1122885875}
   _chunkPrefab: {fileID: 1711832752420103390, guid: fd11a19f510997343b480517f2c003df,
     type: 3}
-  _chunkWidth: 16
+  _chunkWidth: 24
   _chunkHeight: 256
   <seed>k__BackingField: 3748
   _blocks:
@@ -900,10 +904,15 @@ MonoBehaviour:
       _octaves:
         octaves:
         - scale: 10
-          frequency: 0.05
+          frequency: 0.025
           offsetX: -351
           offsetY: -5
           offsetZ: 352
+        - scale: 5
+          frequency: 0.0625
+          offsetX: 1324
+          offsetY: 0
+          offsetZ: -235
     _mountainBiome:
       _continentalnessCurve:
         serializedVersion: 2
@@ -949,6 +958,8 @@ MonoBehaviour:
     _mountainStart: 0.7
     _smoothing: 0.1
     _baseHeight: 70
+    _smoothingFrequency: 0.25
+    _smoothingScale: 0.1
   _caveProcessor:
     _bubbleCaves:
       _enabled: 1
