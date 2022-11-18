@@ -1,19 +1,18 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 
 
-namespace Generation.HelperMaps
+namespace Generation.Processors
 {
     [System.Serializable]
-    public struct Continentalness
+    public struct Continentalness : IProcessors
     {
         public float offsetX;
         public float offsetZ;
         public float frequency;
 
 
-        public void Generate(CreateChunkJob jobData)
+        public void Process(CreateChunkJob jobData)
         {
             int chunkX = jobData.x;
             int chunkY = jobData.z;

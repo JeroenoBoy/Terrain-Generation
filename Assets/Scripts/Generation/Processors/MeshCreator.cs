@@ -1,108 +1,122 @@
 ﻿using System;
 using System.Collections.Generic;
+using Generation.Generators;
 using Unity.Mathematics;
 using UnityEngine;
-
 using Object = UnityEngine.Object;
 
 
 
-namespace Generation.Generators
+namespace Generation.Processors
 {
     [System.Serializable]
-    public struct MeshCreator : IProcessors
+    public class MeshCreator : IProcessors
     {
         [SerializeField] private Material _material;
         [SerializeField] private ComputeShader _shader;
 
 
-        public void Process(CreateChunkJob jobData)
+        public BaseGenerator.ComputeShaderData CreateShader(BaseGenerator generator)
         {
-            ComputeShader shader = Object.Instantiate(_shader);
+            ComputeShader baseShader = _shader;
+            ComputeShader shader = Object.Instantiate(baseShader);
 
-            //  Creating buffers
+            int size = generator.chunkHeight * generator.chunkWidth * generator.chunkWidth;
 
-            ComputeBuffer blocksBuffer = new (jobData.blocks.Length, sizeof(int));
-            ComputeBuffer uvMapBuffer  = new (jobData.blocks.Length, sizeof(int) + sizeof(float) * 14);
-            
+            ComputeBuffer blocksBuffer = new (size, sizeof(int));
+            ComputeBuffer uvMapBuffer = new (size, sizeof(int) + sizeof(float) * 14);
+
             ComputeBuffer verticesBuffer = new (
-                jobData.blocks.Length,
+                size,
                 sizeof(float) * 3,
                 ComputeBufferType.Counter
             );
-            
+
             ComputeBuffer normalBuffer = new (
-                jobData.blocks.Length,
+                size,
                 sizeof(float) * 3,
                 ComputeBufferType.Counter
             );
-            
+
             ComputeBuffer uvBuffer = new (
-                jobData.blocks.Length,
+                size,
                 sizeof(float) * 2,
                 ComputeBufferType.Counter
             );
-            
-            ComputeBuffer triangleBuffer = new (
-                jobData.blocks.Length * 2,
-                sizeof(int) * 3,
-                ComputeBufferType.Append
-            );
-            
 
-            blocksBuffer.SetData(jobData.blocks);
-            uvMapBuffer.SetData(jobData.blockData);
+            ComputeBuffer triangleBuffer = new (
+                size * 2,
+                sizeof(int) * 3,
+                ComputeBufferType.Counter
+            );
+
+            int mainIndex = shader.FindKernel("main");
+            int clearIndex = shader.FindKernel("clear");
+
+            shader.SetInt("size", generator.chunkWidth);
+            shader.SetInt("height", generator.chunkHeight);
+
+            shader.SetBuffer(mainIndex, "blocks", blocksBuffer);
+            shader.SetBuffer(mainIndex, "block_uvs", uvMapBuffer);
+            shader.SetBuffer(mainIndex, "vertices", verticesBuffer);
+            shader.SetBuffer(mainIndex, "normals", normalBuffer);
+            shader.SetBuffer(mainIndex, "uvs", uvBuffer);
+            shader.SetBuffer(mainIndex, "triangles", triangleBuffer);
+
+            shader.SetBuffer(clearIndex, "vertices", verticesBuffer);
+            shader.SetBuffer(clearIndex, "normals", normalBuffer);
+            shader.SetBuffer(clearIndex, "uvs", uvBuffer);
+            shader.SetBuffer(clearIndex, "triangles", triangleBuffer);
+            
+            Debug.Log("New shader made");
+
+            return new BaseGenerator.ComputeShaderData(shader)
+            {
+                blocksBuffer = blocksBuffer,
+                uvMapBuffer = uvMapBuffer,
+                verticesBuffer = verticesBuffer,
+                normalBuffer = normalBuffer,
+                uvBuffer = uvBuffer,
+                triangleBuffer = triangleBuffer,
+            };
+        }
+
+
+        public void Process(CreateChunkJob jobData)
+        {
+            //  Creating buffers
+
+            BaseGenerator.ComputeShaderData shader = jobData.shader;
+
+            shader.blocksBuffer.SetData(jobData.blocks);
+            shader.uvMapBuffer.SetData(jobData.blockData);
 
             //  Running the shader
 
-            int kernelIndex = shader.FindKernel("main");
-
-            shader.SetInt("size", jobData.chunkSize);
-            shader.SetInt("height", jobData.chunkHeight);
-
-            shader.SetBuffer(kernelIndex, "blocks", blocksBuffer);
-            shader.SetBuffer(kernelIndex, "block_uvs", uvMapBuffer);
-            shader.SetBuffer(kernelIndex, "vertices", verticesBuffer);
-            shader.SetBuffer(kernelIndex, "normals", normalBuffer);
-            shader.SetBuffer(kernelIndex, "uvs", uvBuffer);
-            shader.SetBuffer(kernelIndex, "triangles", triangleBuffer);
-
-            verticesBuffer.SetCounterValue(0);
-            normalBuffer.SetCounterValue(0);
-            uvBuffer.SetCounterValue(0);
-            triangleBuffer.SetCounterValue(0);
-
-            shader.Dispatch(kernelIndex, jobData.chunkSize / 8, jobData.chunkHeight / 8, jobData.chunkSize / 8);
+            shader.Dispatch(jobData.chunkSize, jobData.chunkHeight);
 
             //  Creating the mesh
 
-            Vector3[] vertices  = new Vector3[verticesBuffer.count];
-            Vector3[] normals   = new Vector3[normalBuffer.count];
-            Vector2[] uvs       = new Vector2[uvBuffer.count];
-            int3[]    triangles = new int3[triangleBuffer.count];
+            Vector3[] vertices  = new Vector3[shader.verticesBuffer.count];
+            Vector3[] normals   = new Vector3[shader.normalBuffer.count];
+            Vector2[] uvs       = new Vector2[shader.uvBuffer.count];
+            int3[]    triangles = new    int3[shader.triangleBuffer.count];
 
-            verticesBuffer.GetData(vertices);
-            normalBuffer.GetData(normals);
-            uvBuffer.GetData(uvs);
-            triangleBuffer.GetData(triangles);
+            shader.verticesBuffer.GetData(vertices);
+            shader.normalBuffer.GetData(normals);
+            shader.uvBuffer.GetData(uvs);
+            shader.triangleBuffer.GetData(triangles);
 
-            Mesh mesh = CreateMesh(vertices, triangles, normals, uvs);
-            jobData.mesh = mesh;
-            
-            //  Releasing buffers
-
-            blocksBuffer.Release();
-            uvMapBuffer.Release();
-            verticesBuffer.Release();
-            normalBuffer.Release();
-            triangleBuffer.Release();
-            uvBuffer.Release();
-            Object.Destroy(shader);
+            jobData.meshData = new MeshData
+            {
+                vertices = vertices, normals = normals, uvs = uvs, triangles = triangles
+            };
         }
         
 
-        public Mesh CreateMesh(Vector3[] vertices, int3[] triangles, Vector3[] normals, Vector2[] uvs)
+        public void ReduceMesh(CreateChunkJob job)
         {
+            int3[] triangles = job.meshData.triangles;
             Stack<int> triangleStack = new (triangles.Length*2);
 
             for (int i = 0; i < triangles.Length; i++) {
@@ -116,17 +130,12 @@ namespace Generation.Generators
             }
 
             int size = triangleStack.Count / 6 * 4;
-            Array.Resize(ref vertices, size);
-            Array.Resize(ref normals, size);
-            Array.Resize(ref uvs, size);
+            Array.Resize(ref job.meshData.vertices, size);
+            Array.Resize(ref job.meshData.normals, size);
+            Array.Resize(ref job.meshData.uvs, size);
 
-            return new Mesh
-            {
-                vertices = vertices,
-                triangles = triangleStack.ToArray(),
-                normals = normals,
-                uv = uvs
-            };
+            job.meshData.triangles = null;
+            job.meshData.indices = triangleStack.ToArray();
         }
 
 
@@ -166,6 +175,24 @@ namespace Generation.Generators
 
             public static bool operator ==(Quad a, Quad b) => a.indices.Equals(b.indices) && a.normal.Equals(b.normal);
             public static bool operator !=(Quad a, Quad b) => !(a == b);
+            
+            
+            public bool Equals(Quad other)
+            {
+                return indices.Equals(other.indices) && normal.Equals(other.normal);
+            }
+
+
+            public override bool Equals(object obj)
+            {
+                return obj is Quad other && Equals(other);
+            }
+
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(indices, normal);
+            }
         }
     }
 }

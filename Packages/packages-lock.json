@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.unity.burst": {
-      "version": "1.7.3",
+      "version": "1.7.4",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -93,7 +93,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.services.core": {
-      "version": "1.4.2",
+      "version": "1.4.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -162,6 +162,13 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "jutils": {
+      "version": "https://github.com/JeroenoBoy/JUtils.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "df336a6091142bac641c7d1d239c1b210bbd7568"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

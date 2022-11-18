@@ -1,0 +1,212 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel main
+#pragma kernel clear
+
+int size = 16;
+int height = 256;
+float texture_size = 4;
+
+
+struct block
+{
+    int id;
+    float2 default_texture;
+    float2 top;
+    float2 bottom;
+    float2 forward;
+    float2 backward;
+    float2 right;
+    float2 left;
+};
+
+
+RWStructuredBuffer<block> block_uvs;
+RWStructuredBuffer<int> blocks;
+
+RWStructuredBuffer<float3> vertices;
+RWStructuredBuffer<float3> normals;
+RWStructuredBuffer<float2> uvs;
+RWStructuredBuffer<int3> triangles;
+
+
+int block_at(const int x, const int y, const int z)
+{
+    if (x < 0 || y < 0 || z < 0 || x >= size || y >= height || z >= size) return 0;
+    return blocks[z + size * (y + height * x)];
+}
+
+
+float2 uv_cord(float2 pos)
+{
+    int x = pos.x * .25;
+    int y = pos.y * .25;
+    return float2(x,y);
+}
+
+
+bool is_uv_set(const float2 position)
+{
+    return position.x == -1 && position.y == -1;
+}
+
+
+void write_uv(const block block, const int side, const int vertex_index, const int index)
+{
+    float2 base_pos = block.default_texture;
+    
+    switch (side)
+    {
+    case 0:
+        if (is_uv_set(block.top)) break;
+        base_pos = block.top;
+        break;
+    case 1:
+        if (is_uv_set(block.bottom)) break;
+        base_pos = block.bottom;
+        break;
+        
+    case 2:
+        if (is_uv_set(block.forward)) break;
+        base_pos = block.forward;
+        break;
+    case 3:
+        if (is_uv_set(block.backward)) break;
+        base_pos = block.backward;
+        break;
+        
+    case 4:
+        if (is_uv_set(block.right)) break;
+        base_pos = block.right;
+        break;
+    case 5:
+        if (is_uv_set(block.left)) break;
+        base_pos = block.left;
+        break;
+        
+    default: break;
+    }
+
+    switch (index)
+    {
+    case 0:
+        base_pos.y += 1;
+        break;
+    case 1:
+        base_pos.x += 1;
+        base_pos.y += 1;
+        break;
+    case 2:
+        base_pos.x += 1;
+        break;
+    default: break;
+    }
+
+    uvs[vertex_index] = base_pos * .25f;
+}
+
+
+void write_quad(const int block_id, const int side, const float3 a, const float3 b, const float3 c,
+ const float3 d)
+{
+    const block block = block_uvs[block_id];
+    
+    const uint v0 = vertices.IncrementCounter();
+    const uint v1 = vertices.IncrementCounter();
+    const uint v2 = vertices.IncrementCounter();
+    const uint v3 = vertices.IncrementCounter();
+
+    vertices[v0] = a;
+    vertices[v1] = b;
+    vertices[v2] = c;
+    vertices[v3] = d;
+
+    write_uv(block, side, v0, 0);
+    write_uv(block, side, v1, 1);
+    write_uv(block, side, v2, 2);
+    write_uv(block, side, v3, 3);
+
+    normals[v0] = normalize(cross(d-a, b-a));
+    normals[v1] = normalize(cross(a-b, c-b));
+    normals[v2] = normalize(cross(b-c, d-c));
+    normals[v3] = normalize(cross(c-d, a-d));
+
+    triangles[triangles.IncrementCounter()] = int3(v0,v1,v2);
+    triangles[triangles.IncrementCounter()] = int3(v0,v2,v3);
+}
+
+
+[numthreads(128,1,1)]
+void clear(uint3 id : SV_DispatchThreadID)
+{
+    const int totalSize = size * height * size;
+    
+    vertices[id.x] = float3(0,0,0);
+    normals[id.x] = float3(0,0,0);
+    uvs[id.x] = float2(0,0);
+    
+    triangles[id.x] = int3(0,0,0);
+    triangles[totalSize + id.x] = int3(0,0,0);
+}
+
+
+[numthreads(8,8,8)]
+void main(uint3 id : SV_DispatchThreadID)
+{
+    const int block = block_at(id.x, id.y, id.z);
+    if (block == 0) return;
+
+    const int top_point =      block_at(id.x, id.y+1, id.z);
+    const int bottom_point =   block_at(id.x, id.y-1, id.z);
+    const int right_point =    block_at(id.x+1, id.y, id.z);
+    const int left_point =     block_at(id.x-1, id.y, id.z);
+    const int forward_point =  block_at(id.x, id.y, id.z+1);
+    const int backward_point = block_at(id.x, id.y, id.z-1);
+
+    if (top_point == 0) write_quad(
+        block, 0,
+        float3(id.x +.5f,id.y +.5f,id.z +.5f),
+        float3(id.x -.5f,id.y +.5f,id.z +.5f),
+        float3(id.x -.5f,id.y +.5f,id.z -.5f),
+        float3(id.x +.5f,id.y +.5f,id.z -.5f)
+    );
+
+    if (bottom_point == 0) write_quad(
+        block, 1,
+        float3(id.x -.5f,id.y -.5f,id.z -.5f),
+        float3(id.x -.5f,id.y -.5f,id.z +.5f),
+        float3(id.x +.5f,id.y -.5f,id.z +.5f),
+        float3(id.x +.5f,id.y -.5f,id.z -.5f)
+    );
+
+    if (forward_point == 0) write_quad(
+        block, 2,
+        float3(id.x -.5f,id.y +.5f,id.z +.5f),
+        float3(id.x +.5f,id.y +.5f,id.z +.5f),
+        float3(id.x +.5f,id.y -.5f,id.z +.5f),
+        float3(id.x -.5f,id.y -.5f,id.z +.5f)
+    );
+
+    if (backward_point == 0) write_quad(
+        block, 3,
+        float3(id.x +.5f,id.y +.5f,id.z -.5f),
+        float3(id.x -.5f,id.y +.5f,id.z -.5f),
+        float3(id.x -.5f,id.y -.5f,id.z -.5f),
+        float3(id.x +.5f,id.y -.5f,id.z -.5f)
+    );
+
+    if (right_point == 0) write_quad(
+        block, 4,
+        float3(id.x +.5f,id.y +.5f,id.z +.5f),
+        float3(id.x +.5f,id.y +.5f,id.z -.5f),
+        float3(id.x +.5f,id.y -.5f,id.z -.5f),
+        float3(id.x +.5f,id.y -.5f,id.z +.5f)
+    );
+
+    if (left_point == 0) write_quad(
+        block, 5,
+        float3(id.x -.5f,id.y +.5f,id.z -.5f),
+        float3(id.x -.5f,id.y +.5f,id.z +.5f),
+        float3(id.x -.5f,id.y -.5f,id.z +.5f),
+        float3(id.x -.5f,id.y -.5f,id.z -.5f)
+    );
+}

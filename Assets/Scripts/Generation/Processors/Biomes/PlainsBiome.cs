@@ -1,11 +1,9 @@
-﻿using System;
-using Generation.Generators.Helpers;
-using Generation.Processors;
+﻿using Generation.Generators.Helpers;
 using UnityEngine;
 
 
 
-namespace Generation.Biomes
+namespace Generation.Processors.Biomes
 {
     [System.Serializable]
     public class PlainsBiome : IBiomeGenerator
@@ -20,7 +18,7 @@ namespace Generation.Biomes
         private OctavesSampler    _sampler;
         
 
-        public IBiomeGenerator CreateInstance(CreateChunkJob job)
+        public IBiomeGenerator CreateInstance(CreateChunkJob job, BiomeProcessor biomeProcessor)
         {
             System.Random random = new (job.seed);
             

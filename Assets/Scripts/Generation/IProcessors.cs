@@ -5,8 +5,7 @@
 namespace Generation
 {
     
-    [NotNull]
-    public interface Processors
+    public interface IProcessors
     {
         public void Process(CreateChunkJob jobData);
     }

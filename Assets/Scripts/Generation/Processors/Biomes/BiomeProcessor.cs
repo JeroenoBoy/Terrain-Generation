@@ -1,4 +1,4 @@
-﻿using Generation.Biomes;
+﻿using Generation.Processors.Biomes;
 using UnityEngine;
 
 
@@ -16,15 +16,17 @@ namespace Generation.Processors
         [SerializeField] private float _mountainStart;
         [Range(0,.1f)]
         [SerializeField] private float _smoothing;
-        [SerializeField] private int _baseHeight;
+        [SerializeField] private int   _baseHeight;
+        [SerializeField] private float _smoothingFrequency;
 
         public int baseHeight => _baseHeight;
+        public float mountainStart => _mountainStart;
         
         
         public void Process(CreateChunkJob jobData)
         {
-            IBiomeGenerator plains   = _plainsBiome.CreateInstance(jobData);
-            IBiomeGenerator mountain = _mountainBiome.CreateInstance(jobData);
+            IBiomeGenerator plains   = _plainsBiome.CreateInstance(jobData, this);
+            IBiomeGenerator mountain = _mountainBiome.CreateInstance(jobData, this);
 
             plains.jobData = jobData;
             mountain.jobData = jobData;
@@ -34,6 +36,9 @@ namespace Generation.Processors
 
             int size = jobData.chunkSize;
             int chunkHeight = jobData.chunkHeight;
+
+            int chunkX = jobData.x * jobData.chunkSize;
+            int chunkZ = jobData.z * jobData.chunkSize;
             
             float[,] continentalness = jobData.continentalness;
 
@@ -50,8 +55,14 @@ namespace Generation.Processors
                         height = mountain.SampleMapPoint(x, z);
                     }
                     else if (value > _mountainStart) {
-                        float weight = (value - _mountainStart) / _smoothing;
-                        height = (int)(weight * mountain.SampleMapPoint(x, z) + (1 - weight) * plains.SampleMapPoint(x, z));
+                        
+                        //  Noise based smoothing
+
+                        float point      = Mathf.Clamp01(Mathf.PerlinNoise((x + chunkX)*_smoothing, (z + chunkZ)*_smoothing));
+                        float weight     = (value - _mountainStart) / _smoothing;
+                        float baseWeight = 1 - (2*weight - 1) * (2*weight - 1);
+                        
+                        height = (int)(point * baseWeight + (1-baseHeight) * (weight * mountain.SampleMapPoint(x, z) + (1 - weight) * plains.SampleMapPoint(x, z)));
                     }
                     else {
                         height = plains.SampleMapPoint(x, z);
