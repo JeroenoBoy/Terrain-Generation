@@ -430,7 +430,7 @@ Transform:
   m_GameObject: {fileID: 1122885874}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -460,7 +460,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1524428816}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 305.7, y: 70, z: 835.2}
+  m_LocalPosition: {x: 346.5, y: 70, z: 853.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -627,23 +627,8 @@ MonoBehaviour:
     offsetZ: 0
     frequency: 0
   _biomeProcessor:
-    _plainsBiome:
-      _octaves:
-        octaves: []
-    _mountainBiome:
-      _continentalnessCurve:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      _octaves:
-        octaves: []
-    _mountainStart: 0
-    _smoothing: 0
+    _masterBlender: {fileID: 0}
     _baseHeight: 0
-    _smoothingFrequency: 0
-    _smoothingScale: 0
   _caveProcessor:
     _bubbleCaves:
       _enabled: 0
@@ -685,23 +670,8 @@ MonoBehaviour:
     offsetZ: 0
     frequency: 0
   _biomeProcessor:
-    _plainsBiome:
-      _octaves:
-        octaves: []
-    _mountainBiome:
-      _continentalnessCurve:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      _octaves:
-        octaves: []
-    _mountainStart: 0
-    _smoothing: 0
+    _masterBlender: {fileID: 0}
     _baseHeight: 0
-    _smoothingFrequency: 0
-    _smoothingScale: 0
   _caveProcessor:
     _bubbleCaves:
       _enabled: 1
@@ -886,7 +856,7 @@ MonoBehaviour:
   _chunkHolder: {fileID: 1122885875}
   _chunkPrefab: {fileID: 1711832752420103390, guid: fd11a19f510997343b480517f2c003df,
     type: 3}
-  _chunkWidth: 24
+  _chunkWidth: 16
   _chunkHeight: 256
   <seed>k__BackingField: 3748
   _blocks:
@@ -900,66 +870,8 @@ MonoBehaviour:
     offsetZ: -235
     frequency: 0.0025
   _biomeProcessor:
-    _plainsBiome:
-      _octaves:
-        octaves:
-        - scale: 10
-          frequency: 0.025
-          offsetX: -351
-          offsetY: -5
-          offsetZ: 352
-        - scale: 5
-          frequency: 0.0625
-          offsetX: 1324
-          offsetY: 0
-          offsetZ: -235
-    _mountainBiome:
-      _continentalnessCurve:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 125.76688
-          outSlope: 125.76688
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0.024390243
-        - serializedVersion: 3
-          time: 1
-          value: 50
-          inSlope: 2
-          outSlope: 2
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      _octaves:
-        octaves:
-        - scale: 10
-          frequency: 0.05
-          offsetX: 3151
-          offsetY: 0
-          offsetZ: -2524
-        - scale: 5
-          frequency: 0.1
-          offsetX: -352
-          offsetY: 0
-          offsetZ: 253
-        - scale: 30
-          frequency: 0.025
-          offsetX: -351
-          offsetY: -10
-          offsetZ: -35
-    _mountainStart: 0.7
-    _smoothing: 0.1
+    _masterBlender: {fileID: 11400000, guid: 4858ae6e84cdfdb46b3ce4b317fe061a, type: 2}
     _baseHeight: 70
-    _smoothingFrequency: 0.25
-    _smoothingScale: 0.1
   _caveProcessor:
     _bubbleCaves:
       _enabled: 1

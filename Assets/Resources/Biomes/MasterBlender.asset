@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a46791fde83a417c909cbad715965769, type: 3}
+  m_Name: MasterBlender
+  m_EditorClassIdentifier: 
+  _blendMap: 0
+  _randomOctaves:
+    octaves: []
+  _smoothingFrequency: 0.0625
+  _smoothingScale: 0.1
+  _processors:
+  - processor: {fileID: 11400000, guid: 86a200923d455a845ad061d5378f311e, type: 2}
+    heightValue: 0
+    smoothing: 0
+  - processor: {fileID: 11400000, guid: 880e93cc0388bb742ab0b55baab62ddc, type: 2}
+    heightValue: 0.8
+    smoothing: 0.05

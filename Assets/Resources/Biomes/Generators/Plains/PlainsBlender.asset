@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a46791fde83a417c909cbad715965769, type: 3}
+  m_Name: PlainsBlender
+  m_EditorClassIdentifier: 
+  _blendMap: 1
+  _randomOctaves:
+    octaves:
+    - scale: 1
+      frequency: 0.0078125
+      offsetX: 234
+      offsetY: 0
+      offsetZ: -2462
+  _smoothingFrequency: 0.0625
+  _smoothingScale: 0.1
+  _processors:
+  - processor: {fileID: 11400000, guid: 6e03e312f30922548a93d703fbd4cb4e, type: 2}
+    heightValue: 0
+    smoothing: 0
+  - processor: {fileID: 11400000, guid: de904f56e4a455748b28bab7e30e6016, type: 2}
+    heightValue: 0.7
+    smoothing: 0.1

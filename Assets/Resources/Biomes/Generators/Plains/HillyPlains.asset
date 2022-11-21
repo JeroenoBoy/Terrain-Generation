@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8125bfeb77e42f19f641f81c0c6cc1e, type: 3}
+  m_Name: HillyPlains
+  m_EditorClassIdentifier: 
+  _octaves:
+    octaves:
+    - scale: 15
+      frequency: 0.0625
+      offsetX: -342
+      offsetY: 15
+      offsetZ: 343
+    - scale: 15
+      frequency: 0.0625
+      offsetX: -2445
+      offsetY: 0
+      offsetZ: 422
