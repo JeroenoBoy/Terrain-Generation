@@ -35,11 +35,6 @@ namespace Generation.Generators
             CreateChunkJob job = GetCreateChunkJob(x, z);
             job.Execute();
             
-            //  Generating mesh
-            
-            meshCreator.Process(job);
-            job.ReduceMesh();
-            
             //  Creating chunk
             
             CreateChunk(job);

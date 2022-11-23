@@ -636,9 +636,7 @@ MonoBehaviour:
     _longCaveGenerator:
       _enabled: 0
       _value: []
-  _meshCreator:
-    _material: {fileID: 0}
-    _shader: {fileID: 7200000, guid: e3055cb0cea05de4f942f53866a64f63, type: 3}
+  _shader: {fileID: 0}
   _chunksX: 4
   _chunksY: 4
 --- !u!114 &1933211897
@@ -835,9 +833,7 @@ MonoBehaviour:
           offsetX: 3443
           offsetY: 0
           offsetZ: 55115
-  _meshCreator:
-    _material: {fileID: 0}
-    _shader: {fileID: 7200000, guid: e3055cb0cea05de4f942f53866a64f63, type: 3}
+  _shader: {fileID: 0}
   _chunksX: 32
   _chunksY: 32
   _threads: 32
@@ -1035,9 +1031,7 @@ MonoBehaviour:
           offsetX: 3443
           offsetY: 0
           offsetZ: 55115
-  _meshCreator:
-    _material: {fileID: 0}
-    _shader: {fileID: 7200000, guid: e3055cb0cea05de4f942f53866a64f63, type: 3}
+  _shader: {fileID: 7200000, guid: e3055cb0cea05de4f942f53866a64f63, type: 3}
   _target: {fileID: 1524428817}
   _range: 24
   _threads: 8

@@ -70,14 +70,6 @@ namespace Generation.Generators
             thread.Start();
             yield return new WaitWhile(() => thread.IsAlive);
             
-            //  Generating mesh
-            
-            meshCreator.Process(job);
-            
-            thread = new Thread(job.ReduceMesh);
-            thread.Start();
-            yield return new WaitWhile(() => thread.IsAlive);
-            
             //  Creating chunk
             
             CreateChunk(job);

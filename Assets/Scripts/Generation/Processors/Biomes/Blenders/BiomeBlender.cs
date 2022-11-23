@@ -49,6 +49,18 @@ namespace Generation.Processors.Biomes.Blenders
         }
 
 
+        public SetupData FindNext(BaseBiomeProcessor processor)
+        {
+            bool found = false;
+            
+            return _processors.FirstOrDefault(t => {
+                if (found) return true;
+                found = t.processor == processor;
+                return false;
+            });
+        }
+
+
         public override IBiomeGenerator CreateInstance(Random random, CreateChunkJob job, BiomeProcessor biomeProcessor, BiomeBlender parentBlender)
         {
             if (_processors.Length == 0) throw new Exception($"No processors found on {name}");

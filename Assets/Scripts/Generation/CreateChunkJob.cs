@@ -20,19 +20,13 @@ namespace Generation
         public readonly int chunkSize;
         public readonly int chunkHeight;
         public BlockId[,,] blocks { get; private set; }
-
-        public readonly BlockData[] blockData;
-
+        
         public float[,] continentalness;
         public float[,] heightMap;
         
         public IProcessors[] processors;
-        public BaseGenerator.ComputeShaderData shader;
+
         
-        public MeshData meshData;
-
-        public BaseGenerator generator;
-
         public CreateChunkJob(BaseGenerator generator, int x, int z)
         {
             this.x = x;
@@ -43,12 +37,8 @@ namespace Generation
             chunkSize   = generator.chunkWidth;
             chunkHeight = generator.chunkHeight;
 
-            blockData = generator.blocks.Select(t => t.data).ToArray();
-
             blocks = null;
             processors = default;
-            
-            this.generator = generator;
         }
         
         
@@ -61,12 +51,6 @@ namespace Generation
         }
 
 
-        public void ReduceMesh()
-        {
-            generator.meshCreator.ReduceMesh(this);
-        }
-
-
         public T GetProcessor<T>() where T : IProcessors
         {
             return (T)processors.First(t => t is T);
@@ -75,7 +59,7 @@ namespace Generation
 
 
 
-    public struct MeshData
+    public class MeshData
     {
         public Vector3[] vertices;
         public Vector3[] normals;

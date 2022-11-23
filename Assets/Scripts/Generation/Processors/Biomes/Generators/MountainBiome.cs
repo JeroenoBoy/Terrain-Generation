@@ -18,6 +18,9 @@ namespace Generation.Processors.Biomes.Generators
         public override IBiomeGenerator CreateInstance(Random random, CreateChunkJob job, BiomeProcessor biomeProcessor, BiomeBlender parentBlender)
         {
             BiomeBlender.SetupData data = parentBlender.FindSetupData(this);
+            BiomeBlender.SetupData next = parentBlender.FindNext(this);
+
+            float nextValue = next.heightValue == 0 ? 1 : next.heightValue - next.smoothing * .5f;
             
             return new MountainBiomeGenerator
             {
@@ -27,7 +30,7 @@ namespace Generation.Processors.Biomes.Generators
                 continentalness       = job.continentalness,
                 continentalnessCurve  = _continentalnessCurve,
                 continentalnessOffset = data.heightValue - data.smoothing*.5f,
-                continentalnessMulti  = 1/data.smoothing
+                continentalnessMulti  = 1/(nextValue - (data.heightValue - data.smoothing*.5f))
             };
         }
     }
@@ -35,7 +38,6 @@ namespace Generation.Processors.Biomes.Generators
     
     public class MountainBiomeGenerator : IBiomeGenerator
     {
-
         public int baseHeight;
      
         //  Instance

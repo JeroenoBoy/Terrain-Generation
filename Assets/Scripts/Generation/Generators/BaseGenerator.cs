@@ -33,40 +33,34 @@ namespace Generation.Generators
         [SerializeField] private Continentalness _continentalness;
         [SerializeField] private BiomeProcessor _biomeProcessor;
         [SerializeField] private CaveProcessor _caveProcessor;
-        [SerializeField] private MeshCreator _meshCreator;
+        [SerializeField] private ComputeShader _shader;
 
+        private MeshCreator _meshCreator;
 
         protected Dictionary<Vector2Int, Chunk> chunks;
         public MeshCreator meshCreator => _meshCreator;
-
 
         public int chunkWidth => _chunkWidth;
         public int chunkHeight => _chunkHeight;
         public Block[] blocks => _blocks;
         public Transform chunkHolder => _chunkHolder;
-
-
-        private ComputeShaderData _shader;
-        private ISerializationCallbackReceiver _serializationCallbackReceiverImplementation;
-
-
+        
+        
         protected virtual void OnEnable()
         {
-            _shader = _meshCreator.CreateShader(this);
+            _meshCreator = new MeshCreator(this, _shader);
         }
 
 
         protected virtual void OnDisable()
         {
-            _shader.Dispose();
-            _shader = null;
+            _meshCreator.Dispose();
         }
 
 
         protected CreateChunkJob GetCreateChunkJob(int x, int z) =>
             new (this, x, z)
             {
-                shader = _shader,
                 processors = new IProcessors[]
                 {
                     _continentalness,
@@ -87,75 +81,23 @@ namespace Generation.Generators
             chunk.location = new Vector2Int(job.x, job.z);
 
             chunk.blocks = job.blocks;
-            chunk.GetComponent<MeshFilter>().mesh = new Mesh
-            {
-                vertices  = job.meshData.vertices,
-                normals   = job.meshData.normals,
-                uv        = job.meshData.uvs,
-                triangles = job.meshData.indices
-            };
+            chunk.generator = this;
             
             chunks.Add(chunk.location, chunk);
             chunk.transform.parent = _chunkHolder;
         }
 
 
-        #region OjbectPool
-
-
-        public class ComputeShaderData
+        /// <summary>
+        /// Tries to delete a chunk if it exists
+        /// </summary>
+        public void Delete(Vector2Int location)
         {
-            private ComputeShader _shader;
-            public readonly int calculateVoxels;
-            public readonly int clearData;
+            if (chunks is null || !chunks.ContainsKey(location)) return;
 
-            public ComputeBuffer blocksBuffer;
-            public ComputeBuffer uvMapBuffer;
-            
-            public ComputeBuffer verticesBuffer;
-            public ComputeBuffer normalBuffer;
-            public ComputeBuffer uvBuffer;
-            public ComputeBuffer triangleBuffer;
-
-
-            public ComputeShaderData(ComputeShader shader)
-            {
-                _shader = shader;
-                calculateVoxels = shader.FindKernel("main");
-                clearData = shader.FindKernel("clear");
-            }
-
-
-            public void Dispatch(int size, int height)
-            {
-                verticesBuffer.SetCounterValue(0);
-                normalBuffer.SetCounterValue(0);
-                uvBuffer.SetCounterValue(0);
-                triangleBuffer.SetCounterValue(0);
-                
-                verticesBuffer.SetData(Array.Empty<Vector3>());
-                normalBuffer.SetData(Array.Empty<Vector3>());
-                uvBuffer.SetData(Array.Empty<Vector2>());
-                triangleBuffer.SetData(Array.Empty<int3>());
-
-                _shader.Dispatch(clearData, verticesBuffer.count / 128, 1, 1);
-                _shader.Dispatch(calculateVoxels, size/8, height/8, size/8);
-            }
-
-
-            public void Dispose()
-            {
-                Destroy(_shader);
-                blocksBuffer.Release();
-                uvMapBuffer.Release();
-                
-                verticesBuffer.Release();
-                normalBuffer.Release();
-                uvBuffer.Release();
-                triangleBuffer.Release();
-            }
+            Chunk chunk = chunks[location];
+            if (chunk.isActiveAndEnabled) Destroy(chunk);
+            chunks.Remove(location);
         }
-        
-        #endregion
     }
 }

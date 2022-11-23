@@ -81,8 +81,8 @@ namespace Generation.Generators
         {
             if (_chunksToCreate.Contains(chunkPos)) yield break;
             _chunksToCreate.Add(chunkPos);
-            
-            yield return new WaitUntil(() => _activeGenerators < _threads);
+
+            while (_activeGenerators >= _threads) yield return null;
             
             _activeGenerators++;
             
@@ -93,14 +93,6 @@ namespace Generation.Generators
             CreateChunkJob job = GetCreateChunkJob(x, z);
 
             Thread thread = new (job.Execute);
-            thread.Start();
-            yield return new WaitWhile(() => thread.IsAlive);
-        
-            //  Generating mesh
-        
-            meshCreator.Process(job);
-        
-            thread = new Thread(job.ReduceMesh);
             thread.Start();
             yield return new WaitWhile(() => thread.IsAlive);
         

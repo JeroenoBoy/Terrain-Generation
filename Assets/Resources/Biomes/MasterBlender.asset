@@ -15,12 +15,12 @@ MonoBehaviour:
   _blendMap: 0
   _randomOctaves:
     octaves: []
-  _smoothingFrequency: 0.0625
+  _smoothingFrequency: 0.015625
   _smoothingScale: 0.1
   _processors:
   - processor: {fileID: 11400000, guid: 86a200923d455a845ad061d5378f311e, type: 2}
     heightValue: 0
     smoothing: 0
   - processor: {fileID: 11400000, guid: 880e93cc0388bb742ab0b55baab62ddc, type: 2}
-    heightValue: 0.8
+    heightValue: 0.7
     smoothing: 0.05

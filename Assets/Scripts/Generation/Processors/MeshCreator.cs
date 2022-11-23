@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Generation.Generators;
 using Unity.Mathematics;
 using UnityEngine;
@@ -10,15 +11,16 @@ using Object = UnityEngine.Object;
 namespace Generation.Processors
 {
     [System.Serializable]
-    public class MeshCreator : IProcessors
+    public class MeshCreator
     {
-        [SerializeField] private Material _material;
-        [SerializeField] private ComputeShader _shader;
+        private ComputeShaderData _computeShader;
+        private BaseGenerator     _generator;
+        
 
-
-        public BaseGenerator.ComputeShaderData CreateShader(BaseGenerator generator)
+        public MeshCreator(BaseGenerator generator, ComputeShader baseShader)
         {
-            ComputeShader baseShader = _shader;
+            _generator = generator;
+            
             ComputeShader shader = Object.Instantiate(baseShader);
 
             int size = generator.chunkHeight * generator.chunkWidth * generator.chunkWidth;
@@ -70,7 +72,7 @@ namespace Generation.Processors
             
             Debug.Log("New shader made");
 
-            return new BaseGenerator.ComputeShaderData(shader)
+            _computeShader = new ComputeShaderData(shader)
             {
                 blocksBuffer = blocksBuffer,
                 uvMapBuffer = uvMapBuffer,
@@ -82,18 +84,18 @@ namespace Generation.Processors
         }
 
 
-        public void Process(CreateChunkJob jobData)
+        public MeshData Process(BlockId[,,] blocks, int chunkSize, int chunkHeight)
         {
             //  Creating buffers
 
-            BaseGenerator.ComputeShaderData shader = jobData.shader;
+            ComputeShaderData shader = _computeShader;
 
-            shader.blocksBuffer.SetData(jobData.blocks);
-            shader.uvMapBuffer.SetData(jobData.blockData);
+            shader.blocksBuffer.SetData(blocks);
+            shader.uvMapBuffer.SetData(_generator.blocks.Select(b => b.data).ToArray());
 
             //  Running the shader
 
-            shader.Dispatch(jobData.chunkSize, jobData.chunkHeight);
+            shader.Dispatch(chunkSize, chunkHeight);
 
             //  Creating the mesh
 
@@ -107,16 +109,16 @@ namespace Generation.Processors
             shader.uvBuffer.GetData(uvs);
             shader.triangleBuffer.GetData(triangles);
 
-            jobData.meshData = new MeshData
+            return new MeshData
             {
                 vertices = vertices, normals = normals, uvs = uvs, triangles = triangles
             };
         }
         
 
-        public void ReduceMesh(CreateChunkJob job)
+        public MeshData ReduceMesh(MeshData meshData)
         {
-            int3[] triangles = job.meshData.triangles;
+            int3[] triangles = meshData.triangles;
             Stack<int> triangleStack = new (triangles.Length*2);
 
             for (int i = 0; i < triangles.Length; i++) {
@@ -130,37 +132,21 @@ namespace Generation.Processors
             }
 
             int size = triangleStack.Count / 6 * 4;
-            Array.Resize(ref job.meshData.vertices, size);
-            Array.Resize(ref job.meshData.normals, size);
-            Array.Resize(ref job.meshData.uvs, size);
+            Array.Resize(ref meshData.vertices, size);
+            Array.Resize(ref meshData.normals, size);
+            Array.Resize(ref meshData.uvs, size);
 
-            job.meshData.triangles = null;
-            job.meshData.indices = triangleStack.ToArray();
+            meshData.triangles = null;
+            meshData.indices = triangleStack.ToArray();
+
+            return meshData;
         }
 
 
-
-        // public struct Triangle
-        // {
-        //     public uint x, y, z;
-        //
-        //
-        //     public Triangle(uint x, uint y, uint z)
-        //     {
-        //         this.x = x;
-        //         this.y = y;
-        //         this.z = z;
-        //     }
-        //
-        //
-        //     public static readonly Triangle Zero = new ();
-        //
-        //     public override bool Equals(object obj)
-        //         => obj is Triangle t && t.x == y && t.y == y && t.z == z;
-        //
-        //
-        //     public override int GetHashCode() => HashCode.Combine(x, y, z);
-        // }
+        public void Dispose()
+        {
+            _computeShader.Dispose();
+        }
 
 
 
@@ -192,6 +178,61 @@ namespace Generation.Processors
             public override int GetHashCode()
             {
                 return HashCode.Combine(indices, normal);
+            }
+        }
+        
+        
+        
+        public class ComputeShaderData
+        {
+            private ComputeShader _shader;
+            public readonly int calculateVoxels;
+            public readonly int clearData;
+
+            public ComputeBuffer blocksBuffer;
+            public ComputeBuffer uvMapBuffer;
+            
+            public ComputeBuffer verticesBuffer;
+            public ComputeBuffer normalBuffer;
+            public ComputeBuffer uvBuffer;
+            public ComputeBuffer triangleBuffer;
+
+
+            public ComputeShaderData(ComputeShader shader)
+            {
+                _shader = shader;
+                calculateVoxels = shader.FindKernel("main");
+                clearData = shader.FindKernel("clear");
+            }
+
+
+            public void Dispatch(int size, int height)
+            {
+                verticesBuffer.SetCounterValue(0);
+                normalBuffer.SetCounterValue(0);
+                uvBuffer.SetCounterValue(0);
+                triangleBuffer.SetCounterValue(0);
+                
+                verticesBuffer.SetData(Array.Empty<Vector3>());
+                normalBuffer.SetData(Array.Empty<Vector3>());
+                uvBuffer.SetData(Array.Empty<Vector2>());
+                triangleBuffer.SetData(Array.Empty<int3>());
+
+                _shader.Dispatch(clearData, verticesBuffer.count / 128, 1, 1);
+                _shader.Dispatch(calculateVoxels, size/8, height/8, size/8);
+            }
+
+
+            public void Dispose()
+            {
+                Object.Destroy(_shader);
+                blocksBuffer.Release();
+                uvMapBuffer.Release();
+                
+                verticesBuffer.Release();
+                normalBuffer.Release();
+                uvBuffer.Release();
+                triangleBuffer.Release();
             }
         }
     }
