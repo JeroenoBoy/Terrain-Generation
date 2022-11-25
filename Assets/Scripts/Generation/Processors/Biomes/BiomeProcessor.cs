@@ -2,6 +2,7 @@
 using Generation.Processors.Biomes.Blenders;
 using Generation.Processors.Biomes.Generators;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 
 
@@ -18,7 +19,7 @@ namespace Generation.Processors.Biomes
         
         public void Process(CreateChunkJob jobData)
         {
-            System.Random random = new (jobData.seed);
+            Random random = new (jobData.seed);
             IBiomeGenerator generator = _masterBlender.CreateInstance(random, jobData, this, null);
 
             int size   = jobData.chunkSize;

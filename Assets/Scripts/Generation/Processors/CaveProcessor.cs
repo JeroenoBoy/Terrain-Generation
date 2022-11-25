@@ -2,14 +2,16 @@
 using System.Globalization;
 using Generation.Generators.Helpers;
 using JUtils.Attributes;
+using Unity.Mathematics;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 
 
 namespace Generation.Processors
 {
     [System.Serializable]
-    public class CaveProcessor : IProcessors
+    public struct CaveProcessor : IProcessors
     {
         [Header("Generators")]
         [SerializeField] private Optional<BubbleCave[]> _bubbleCaves;
@@ -18,7 +20,7 @@ namespace Generation.Processors
         
         public void Process(CreateChunkJob jobData)
         {
-            System.Random random = new (jobData.seed);
+            Random random = new (jobData.seed);
 
             if (_bubbleCaves.enabled) {
                 BubbleCave[] caves = _bubbleCaves.value;
@@ -59,15 +61,15 @@ namespace Generation.Processors
             
             
             
-            public void Process(CreateChunkJob data, System.Random random)
+            public void Process(CreateChunkJob data, Random random)
             {
                 //  Pre calculating values
                 
-                int shapeX = data.x * data.chunkSize + (int)(randomPositionOffset * random.NextDouble());
-                int shapeZ = data.z * data.chunkSize + (int)(randomPositionOffset * random.NextDouble());
+                int shapeX = data.x * data.chunkSize + (int)(randomPositionOffset * random.NextFloat());
+                int shapeZ = data.z * data.chunkSize + (int)(randomPositionOffset * random.NextFloat());
                 
-                int heightMapX = data.x * data.chunkSize + (int)(randomPositionOffset * random.NextDouble());
-                int heightMapZ = data.z * data.chunkSize + (int)(randomPositionOffset * random.NextDouble());
+                int heightMapX = data.x * data.chunkSize + (int)(randomPositionOffset * random.NextFloat());
+                int heightMapZ = data.z * data.chunkSize + (int)(randomPositionOffset * random.NextFloat());
 
                 //  Calculating octaves
 
@@ -84,7 +86,7 @@ namespace Generation.Processors
                     for (int z = data.chunkSize; z --> 0;) {
                         float smX   = (shapeX + x) * mapFrequency;
                         float smZ   = (shapeZ + z) * mapFrequency;
-                        float value = Mathf.PerlinNoise(smX, smZ) + heightMap[x, z];
+                        float value = noise.cnoise(new float2(smX, smZ)) + heightMap[x, z];
                         
                         //  Calculating height offset
                         
@@ -101,9 +103,9 @@ namespace Generation.Processors
                         //  Adding height variation
                        
                         float halfHeight   = height * .5f;
-                        int   targetHeight = Mathf.CeilToInt(sy + halfHeight);
+                        int   targetHeight = (int)math.ceil(sy + halfHeight);
 
-                        for (int y = Mathf.FloorToInt(sy - halfHeight); y < targetHeight; y++)
+                        for (int y = (int)math.floor(sy - halfHeight); y < targetHeight; y++)
                             data.blocks[x, y, z] = BlockId.Air;
                     }
                 }
@@ -140,7 +142,7 @@ namespace Generation.Processors
             [SerializeField] private Octave _mask;
 
 
-            public void Process(CreateChunkJob data, System.Random random)
+            public void Process(CreateChunkJob data, Random random)
             {
                 int size = data.chunkSize;
                 
@@ -181,10 +183,11 @@ namespace Generation.Processors
                         //  Processing cave
 
                         float halfHeight = height * .5f;
-                        int targetHeight = Mathf.CeilToInt(sy + halfHeight);
+                        int targetHeight = (int)math.ceil(sy + halfHeight);
 
-                        for (int y = Mathf.CeilToInt(sy - halfHeight); y < targetHeight; y++)
+                        for (int y = (int)math.floor(sy - halfHeight); y < targetHeight; y++) {
                             data.blocks[x, y, z] = BlockId.Air;
+                        }
                     }
                 }
             }

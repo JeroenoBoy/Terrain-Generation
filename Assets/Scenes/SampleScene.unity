@@ -951,17 +951,17 @@ MonoBehaviour:
           - scale: 0.6
             frequency: 0.125
             offsetX: -534
-            offsetY: -0.2
+            offsetY: 0
             offsetZ: -235
           - scale: 0.3
             frequency: 0.125
             offsetX: -534
-            offsetY: -0.1
+            offsetY: 0
             offsetZ: -235
-          - scale: 0.05
+          - scale: 0.1
             frequency: 0.3
             offsetX: 531
-            offsetY: -0.05
+            offsetY: 0
             offsetZ: -41
         heightMapFrequency: 0.009
         minY: 6

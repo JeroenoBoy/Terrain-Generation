@@ -1,5 +1,6 @@
 ﻿using Generation.Processors.Biomes.Blenders;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 
 
@@ -12,6 +13,6 @@ namespace Generation.Processors.Biomes
         protected BiomeBlender _blender;
 
 
-        public abstract IBiomeGenerator CreateInstance(System.Random random, CreateChunkJob job, BiomeProcessor biomeProcessor, BiomeBlender parentBlender);
+        public abstract IBiomeGenerator CreateInstance(Random random, CreateChunkJob job, BiomeProcessor biomeProcessor, BiomeBlender parentBlender);
     }
 }

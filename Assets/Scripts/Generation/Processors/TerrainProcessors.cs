@@ -1,6 +1,7 @@
 ﻿using Generation.Generators.Helpers;
+using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Random = Unity.Mathematics.Random;
 
 
 
@@ -10,7 +11,6 @@ namespace Generation.Processors
     public struct TerrainProcessors : IProcessors
     {
         [SerializeField] private int _baseLevel;
-        [SerializeField] private int _seedOffset;
         
         [Header("Layers")]
         [SerializeField] private TerrainLayer[]  _perlinLayers;
@@ -29,9 +29,9 @@ namespace Generation.Processors
         }
 
 
-        private float[,] CreateMap(int chunkX, int chunkY, int size, int seed)
+        private float[,] CreateMap(int chunkX, int chunkY, int size, uint seed)
         {
-            System.Random random = new (seed * _seedOffset);
+            Random random = new (seed);
             
             float[,] map = new float[size,size];
             
@@ -40,8 +40,8 @@ namespace Generation.Processors
             for (int i = _perlinLayers.Length; i --> 0;) {
                 TerrainLayer layer = _perlinLayers[i];
                 
-                float offsetX = chunkX * size + (float)(layer.offsetX * random.NextDouble());
-                float offsetZ = chunkY * size + (float)(layer.offsetZ * random.NextDouble());
+                float offsetX = chunkX * size + layer.offsetX * random.NextFloat();
+                float offsetZ = chunkY * size + layer.offsetZ * random.NextFloat();
                 
                 for (int x = 0; x < size; x++) {
                     for (int z = 0; z < size; z++) {
@@ -62,9 +62,9 @@ namespace Generation.Processors
         {
             //  Configuring snow map
 
-            System.Random random = new (_seedOffset + jobData.seed);
-            float snowOffsetX = chunkX * size + _blockLevels.offsetX * (float)random.NextDouble();
-            float snowOffsetZ = chunkY * size + _blockLevels.offsetZ * (float)random.NextDouble();
+            Random random = new (jobData.seed);
+            float snowOffsetX = chunkX * size + _blockLevels.offsetX * random.NextFloat();
+            float snowOffsetZ = chunkY * size + _blockLevels.offsetZ * random.NextFloat();
             
             //  Adding to chunk and filling with stone
             
@@ -74,12 +74,12 @@ namespace Generation.Processors
             
             for (int x = size; x --> 0;) {
                 for (int z = size; z --> 0;) {
-                    int height = _baseLevel + Mathf.RoundToInt(map[x,z]);
+                    int height = _baseLevel + (int)math.round(map[x,z]);
 
                     if (height >= bLevel.snowLevel) {
                         float pointX = (snowOffsetX + x) * bLevel.frequency;
                         float pointY = (snowOffsetZ + z) * bLevel.frequency;
-                        float snowHeight = bLevel.snowLevel + Mathf.PerlinNoise(pointX, pointY) * bLevel.scale;
+                        float snowHeight = bLevel.snowLevel + noise.cnoise(new float2(pointX, pointY)) * bLevel.scale;
                         
                         jobData.blocks[x, height, z] = height >= snowHeight ? BlockId.Snow : BlockId.Grass;
                     }

@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using Unity.Mathematics;
+using Random = Unity.Mathematics.Random;
 
 
 
@@ -18,10 +20,10 @@ namespace Generation.Processors
             int chunkY = jobData.z;
             int size   = jobData.chunkSize;
 
-            System.Random random = new (jobData.seed);
+            Random random = new (jobData.seed);
 
-            float cOffsetX = chunkX * size + offsetX * (float)random.NextDouble();
-            float cOffsetZ = chunkY * size + offsetZ * (float)random.NextDouble();
+            float cOffsetX = chunkX * size + offsetX * random.NextFloat();
+            float cOffsetZ = chunkY * size + offsetZ * random.NextFloat();
 
             float[,] map = new float[size, size];
             

@@ -2,7 +2,7 @@
 using Generation.Generators.Helpers;
 using Generation.Processors.Biomes.Blenders;
 using UnityEngine;
-using Random = System.Random;
+using Random = Unity.Mathematics.Random;
 
 
 

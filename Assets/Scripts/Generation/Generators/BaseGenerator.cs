@@ -22,7 +22,7 @@ namespace Generation.Generators
         [Header("Generator data")]
         [SerializeField] private int _chunkWidth;
         [SerializeField] private int _chunkHeight;
-        [field: SerializeField] public int seed { get; private set; }
+        [field: SerializeField] public uint seed { get; private set; }
 
         [Space]
         [SerializeField] private Block[] _blocks;

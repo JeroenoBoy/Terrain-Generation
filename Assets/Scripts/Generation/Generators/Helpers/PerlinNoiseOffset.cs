@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using Random = System.Random;
+using Random = Unity.Mathematics.Random;
 
 
 
@@ -14,8 +14,8 @@ namespace Generation.Generators.Helpers
         {
             Random random = new (job.seed);
             
-            _offsetX = (int)(job.x * job.chunkSize + offsetXMulti * (float)random.NextDouble());
-            _offsetZ = (int)(job.z * job.chunkSize + offsetZMulti * (float)random.NextDouble());
+            _offsetX = (int)(job.x * job.chunkSize + offsetXMulti * random.NextFloat());
+            _offsetZ = (int)(job.z * job.chunkSize + offsetZMulti * random.NextFloat());
         }
 
         public float PerlinNoise(int x, int z)

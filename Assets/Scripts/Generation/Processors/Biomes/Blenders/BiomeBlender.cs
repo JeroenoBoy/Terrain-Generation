@@ -6,7 +6,7 @@ using JUtils.Attributes;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
-using Random = System.Random;
+using Random = Unity.Mathematics.Random;
 
 
 

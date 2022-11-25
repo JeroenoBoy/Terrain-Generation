@@ -12,7 +12,7 @@ namespace Generation
 {
     public class CreateChunkJob
     {
-        public readonly int seed;
+        public readonly uint seed;
         
         public readonly int x;
         public readonly int z;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 
 
@@ -23,7 +24,7 @@ namespace Generation.Generators.Helpers
         }
         
 
-        public float[,] Calculate(System.Random randomizer, int startX, int startZ, int size)
+        public float[,] Calculate(Random randomizer, int startX, int startZ, int size)
         {
             float[,] map = new float[size,size];
             Calculate(randomizer, startX, startZ, size, ref map);
@@ -33,11 +34,11 @@ namespace Generation.Generators.Helpers
 
         public void Calculate(int startX, int startZ, ref float[,] map)
         {
-            Calculate(new System.Random(0), startX, startZ, map.GetLength(0), ref map);
+            Calculate(new Random(0), startX, startZ, map.GetLength(0), ref map);
         }
 
         
-        public void Calculate(System.Random random, int startX, int startZ, int size, ref float[,] map)
+        public void Calculate(Random random, int startX, int startZ, int size, ref float[,] map)
         {
             for (int i = 0; i < octaves.Length; i++)
             {
@@ -76,10 +77,10 @@ namespace Generation.Generators.Helpers
         public float offsetZ;
 
 
-        public void Calculate(System.Random random, int startX, int startZ, int size, ref float[,] map)
+        public void Calculate(Random random, int startX, int startZ, int size, ref float[,] map)
         {
-            int baseX = startX + (int)(offsetX * random.NextDouble());
-            int baseZ = startZ + (int)(offsetZ * random.NextDouble());
+            int baseX = startX + (int)(offsetX * random.NextFloat());
+            int baseZ = startZ + (int)(offsetZ * random.NextFloat());
             
             for (int x = 0; x < size; x++) {
                 for (int z = 0; z < size; z++) {
@@ -104,15 +105,15 @@ namespace Generation.Generators.Helpers
         private readonly Octave[] _octaves;
         private readonly int2[]   _positions;
         
-        public OctavesSampler(System.Random random, Octave[] octaves, int startX, int startZ)
+        public OctavesSampler(Random random, Octave[] octaves, int startX, int startZ)
         {
             _octaves   = octaves;
             _positions = new int2[octaves.Length];
             
             for (int i = 0; i < octaves.Length; i++) {
                 _positions[i] = new int2(
-                    (int)(startX + _octaves[i].offsetX * random.NextDouble()),
-                    (int)(startZ + _octaves[i].offsetZ * random.NextDouble())
+                    (int)(startX + _octaves[i].offsetX * random.NextFloat()),
+                    (int)(startZ + _octaves[i].offsetZ * random.NextFloat())
                 );
             }
         }
