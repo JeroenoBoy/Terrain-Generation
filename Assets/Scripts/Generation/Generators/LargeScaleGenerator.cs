@@ -5,6 +5,7 @@ using System.Threading;
 using Generation.Generators.Helpers;
 using JUtils.Attributes;
 using JUtils.Extensions;
+using Unity.Mathematics;
 using UnityEngine;
 
 
@@ -28,7 +29,7 @@ namespace Generation.Generators
             if (_isRunning) throw new Exception("Already running!");
             _isRunning = true;
 
-            chunks = new Dictionary<Vector2Int, Chunk>();
+            chunks = new Dictionary<int2, Chunk>();
 
             for (int x = _chunksX; x-- > 0;) {
                 for (int y = _chunksY; y-- > 0;) {

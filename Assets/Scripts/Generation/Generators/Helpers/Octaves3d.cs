@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -49,22 +50,7 @@ namespace Generation.Generators.Helpers
             float cY = y * frequency;
             float cZ = z * frequency;
             
-            return Calculate3dPerlinNoise(cX,cY,cZ) * scale;
-        }
-        
-        
-        public static float Calculate3dPerlinNoise(float x, float y, float z)
-        {
-            y += 1;
-            z += 2;
-            float xy = Perlin3dFixed(x, y);
-            float xz = Perlin3dFixed(x, z);
-            float yz = Perlin3dFixed(y, z);
-            float yx = Perlin3dFixed(y, x);
-            float zx = Perlin3dFixed(z, x);
-            float zy = Perlin3dFixed(z, y);
-
-            return (xy + yz + xz + yx + zy + zx) / 6;
+            return noise.cnoise(new float3(cX, cY, cZ)) * scale;
         }
 
         private static float Perlin3dFixed(float a, float b) => Mathf.Sin(Mathf.PI * Mathf.PerlinNoise(a, b));
@@ -72,10 +58,10 @@ namespace Generation.Generators.Helpers
 
 
 
-    public class Octave3dSampler
+    public readonly struct Octave3dSampler
     {
-        private readonly Octave3d[]     _octaves;
-        private readonly Vector3Int[] _positions;
+        private readonly Octave3d[] _octaves;
+        private readonly int3[]     _positions;
 
 
         public Octave3dSampler(System.Random random, Octaves3d octaves, int startX, int startY, int startZ)
@@ -84,10 +70,10 @@ namespace Generation.Generators.Helpers
         public Octave3dSampler(System.Random random, Octave3d[] octaves, int startX, int startY, int startZ)
         {
             _octaves   = octaves;
-            _positions = new Vector3Int[octaves.Length];
+            _positions = new int3[octaves.Length];
             
             for (int i = 0; i < octaves.Length; i++) {
-                _positions[i] = new Vector3Int(
+                _positions[i] = new int3(
                     (int)(startX + _octaves[i].offsetX * random.NextDouble()),
                     (int)(startY + _octaves[i].offsetY * random.NextDouble()),
                     (int)(startZ + _octaves[i].offsetZ * random.NextDouble())

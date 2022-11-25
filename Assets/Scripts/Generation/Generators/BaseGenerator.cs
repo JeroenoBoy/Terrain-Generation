@@ -37,7 +37,7 @@ namespace Generation.Generators
 
         private MeshCreator _meshCreator;
 
-        protected Dictionary<Vector2Int, Chunk> chunks;
+        protected Dictionary<int2, Chunk> chunks;
         public MeshCreator meshCreator => _meshCreator;
 
         public int chunkWidth => _chunkWidth;
@@ -78,7 +78,7 @@ namespace Generation.Generators
             Chunk chunk    = Instantiate(_chunkPrefab.gameObject, transform).GetComponent<Chunk>();
             chunk.size     = _chunkWidth;
             chunk.height   = _chunkHeight;
-            chunk.location = new Vector2Int(job.x, job.z);
+            chunk.location = new int2(job.x, job.z);
 
             chunk.blocks = job.blocks;
             chunk.generator = this;
@@ -91,7 +91,7 @@ namespace Generation.Generators
         /// <summary>
         /// Tries to delete a chunk if it exists
         /// </summary>
-        public void Delete(Vector2Int location)
+        public void Delete(int2 location)
         {
             if (chunks is null || !chunks.ContainsKey(location)) return;
 

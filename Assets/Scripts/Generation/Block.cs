@@ -1,4 +1,5 @@
 ﻿using JUtils.Attributes;
+using Unity.Mathematics;
 using UnityEngine;
 
 
@@ -10,12 +11,12 @@ namespace Generation
     {
         [SerializeField] private BlockData _blockData = new ()
         {
-            top      = new Vector2(-1, -1),
-            bottom   = new Vector2(-1, -1),
-            forward  = new Vector2(-1, -1),
-            backward = new Vector2(-1, -1),
-            right    = new Vector2(-1, -1),
-            left     = new Vector2(-1, -1),
+            top      = new float2(-1, -1),
+            bottom   = new float2(-1, -1),
+            forward  = new float2(-1, -1),
+            backward = new float2(-1, -1),
+            right    = new float2(-1, -1),
+            left     = new float2(-1, -1),
         };
 
         public BlockData data => _blockData;
@@ -27,13 +28,13 @@ namespace Generation
     public struct BlockData
     {
         public BlockId id;
-        public Vector2 default_texture;
-        public Vector2 top;
-        public Vector2 bottom;
-        public Vector2 forward;
-        public Vector2 backward;
-        public Vector2 right;
-        public Vector2 left;
+        public float2 default_texture;
+        public float2 top;
+        public float2 bottom;
+        public float2 forward;
+        public float2 backward;
+        public float2 right;
+        public float2 left;
     }
     
     
@@ -41,12 +42,12 @@ namespace Generation
     [System.Serializable]
     public struct UvSidePositions
     {
-        public Optional<Vector2> top;
-        public Optional<Vector2> bottom;
-        public Optional<Vector2> forward;
-        public Optional<Vector2> backward;
-        public Optional<Vector2> right;
-        public Optional<Vector2> left;
+        public Optional<float2> top;
+        public Optional<float2> bottom;
+        public Optional<float2> forward;
+        public Optional<float2> backward;
+        public Optional<float2> right;
+        public Optional<float2> left;
     }
     
     

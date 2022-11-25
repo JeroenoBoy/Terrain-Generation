@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using JUtils.Attributes;
+using Unity.Mathematics;
 using UnityEngine;
 
 
@@ -19,7 +20,7 @@ namespace Generation.Generators
         [Button]
         public void GenerateBase()
         {
-            chunks = new Dictionary<Vector2Int, Chunk>();
+            chunks = new Dictionary<int2, Chunk>();
             for (int x = _chunksX; x --> 0;) {
                 for (int z = _chunksY; z --> 0;) {
                     GenerateChunk(x, z);

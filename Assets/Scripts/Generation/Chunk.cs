@@ -5,6 +5,7 @@ using Generation.Generators;
 using Generation.Processors;
 using JUtils.Attributes;
 using JUtils.Extensions;
+using Unity.Mathematics;
 using UnityEngine;
 
 
@@ -13,14 +14,14 @@ namespace Generation
 {
     public class Chunk : MonoBehaviour
     {
-        [SerializeField] private Vector2Int _location;
+        [SerializeField] private int2 _location;
 
         public BaseGenerator generator { get; set; }
         public BlockId[,,] blocks { get; set; }
         public int size { get; set; }
         public int height { get; set; }
         
-        public Vector2Int location
+        public int2 location
         {
             get => _location;
             set {

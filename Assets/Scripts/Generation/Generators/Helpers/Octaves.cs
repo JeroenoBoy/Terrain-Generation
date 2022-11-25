@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 
@@ -92,24 +93,24 @@ namespace Generation.Generators.Helpers
         {
             float cX = x * frequency;
             float cY = y * frequency;
-            return offsetY + Mathf.PerlinNoise(cX, cY) * scale;
+            return offsetY + noise.cnoise(new float2(cX, cY)) * scale;
         }
     }
 
 
 
-    public class OctavesSampler
+    public readonly struct OctavesSampler
     {
-        private readonly Octave[]     _octaves;
-        private readonly Vector2Int[] _positions;
+        private readonly Octave[] _octaves;
+        private readonly int2[]   _positions;
         
         public OctavesSampler(System.Random random, Octave[] octaves, int startX, int startZ)
         {
             _octaves   = octaves;
-            _positions = new Vector2Int[octaves.Length];
+            _positions = new int2[octaves.Length];
             
             for (int i = 0; i < octaves.Length; i++) {
-                _positions[i] = new Vector2Int(
+                _positions[i] = new int2(
                     (int)(startX + _octaves[i].offsetX * random.NextDouble()),
                     (int)(startZ + _octaves[i].offsetZ * random.NextDouble())
                 );

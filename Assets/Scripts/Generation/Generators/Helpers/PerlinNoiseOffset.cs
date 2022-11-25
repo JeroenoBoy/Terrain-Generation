@@ -5,7 +5,7 @@ using Random = System.Random;
 
 namespace Generation.Generators.Helpers
 {
-    public struct PerlinNoiseOffset
+    public readonly struct PerlinNoiseOffset
     {
         private readonly int _offsetX;
         private readonly int _offsetZ;

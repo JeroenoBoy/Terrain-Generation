@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Generation.Generators.Helpers;
 using JUtils.Attributes;
+using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 using Random = System.Random;
@@ -70,7 +71,7 @@ namespace Generation.Processors.Biomes.Blenders
             int x = job.x * chunkSize;
             int z = job.z * chunkSize;
             
-            return _blendMap switch
+            return (IBiomeGenerator)(_blendMap switch
             {
                 BlendMap.Continentalness => new MapBiomeBlender
                 {
@@ -90,7 +91,7 @@ namespace Generation.Processors.Biomes.Blenders
                     }).ToArray()
                     
                 },
-                BlendMap.Random => new MapBiomeBlender()
+                BlendMap.Random => new MapBiomeBlender
                 {
                     blendMap         = _randomOctaves.Calculate(random, x, z, chunkSize),
                     blendWeightMap   = new float[chunkSize,chunkSize],
@@ -110,12 +111,12 @@ namespace Generation.Processors.Biomes.Blenders
                     }).ToArray()
                 },
                 _ => throw new ArgumentOutOfRangeException() 
-            };
+            });
         }
         
         
         
-        public class MapBiomeBlender : IBiomeGenerator
+        public struct MapBiomeBlender : IBiomeGenerator
         {
             public float[,] blendMap;
             public float[,] blendWeightMap;
@@ -152,10 +153,10 @@ namespace Generation.Processors.Biomes.Blenders
                         continue;
                     }
 
-                    float point = Mathf.Clamp01(Mathf.PerlinNoise((x + chunkX)*smoothingFrequency, (z + chunkZ)*smoothingFrequency));
+                    float point = math.clamp(noise.cnoise(new float2((x + chunkX)*smoothingFrequency, (z + chunkZ)*smoothingFrequency)),0,1);
 
                     float weight     = (value - minHeight) / smoothing;
-                    float baseWeight = (1 - Mathf.Pow(2* weight-1, 2))*smoothingScale;
+                    float baseWeight = (1 - math.pow(2* weight-1, 2))*smoothingScale;
                     float multi      = weight * (1-baseWeight) + point * baseWeight;
                     
                     //  Noise based smoothing
