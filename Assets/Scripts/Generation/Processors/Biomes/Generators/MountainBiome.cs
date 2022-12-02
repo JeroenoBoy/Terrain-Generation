@@ -20,12 +20,6 @@ namespace Generation.Processors.Biomes.Generators
         [SerializeField] private int _minContinentalnessHeight;
         [SerializeField] private int _maxContinentalnessHeight;
         [SerializeField] private CalculationType _calculation;
-
-        [Header("3dNoise")]
-        [SerializeField] private float _3dNoiseTopFalloff;
-        [SerializeField] private float _3dNoiseBottomFalloff;
-        [SerializeField] private float _3dNoiseFrequency;
-        [SerializeField] private float _3dNoiseMargin;
      
         [SerializeField] private Octaves _octaves;
         
@@ -48,13 +42,6 @@ namespace Generation.Processors.Biomes.Generators
                 minContinentalnessHeight = _minContinentalnessHeight,
                 maxContinentalnessHeight = _maxContinentalnessHeight,
                 calculation              = _calculation,
-                
-                topFalloff       = _3dNoiseTopFalloff,
-                bottomFalloff    = _3dNoiseBottomFalloff,
-                frequency3dNoise = _3dNoiseFrequency,
-                
-                cx = job.x * job.chunkSize,
-                cz = job.z * job.chunkSize
             };
         }
     }
@@ -73,13 +60,6 @@ namespace Generation.Processors.Biomes.Generators
 
         public int minContinentalnessHeight;
         public int maxContinentalnessHeight;
-
-        public float topFalloff;
-        public float frequency3dNoise;
-        public float bottomFalloff;
-
-        //  Chunk locations
-        public int cx, cz;
         
         public CalculationType calculation;
 
@@ -106,13 +86,7 @@ namespace Generation.Processors.Biomes.Generators
 
         public BlockId SampleBlock(int x, int y, int z, int heightValue)
         {
-            float multi = y > heightValue
-                ? 1 + (y-heightValue) * topFalloff
-                : 1 - (heightValue-y) * bottomFalloff;
-            
-            float value = .5f+.5f*noise.cnoise(math.float3(x+cx,y,z+cz) * frequency3dNoise) + multi;
-
-            return value > 1 ? BlockId.Air : BlockId.Stone;
+            return y > heightValue ? BlockId.Air : BlockId.Stone;
         }
     }
 }
