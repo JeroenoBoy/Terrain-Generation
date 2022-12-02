@@ -13,7 +13,6 @@ namespace Generation.Generators.Helpers
     public struct Octaves
     {
         public Octave[] octaves;
-
         
 
         public float[,] Calculate(int startX, int startZ, int size)
@@ -94,7 +93,7 @@ namespace Generation.Generators.Helpers
         {
             float cX = x * frequency;
             float cY = y * frequency;
-            return offsetY + noise.cnoise(new float2(cX, cY)) * scale;
+            return offsetY + (.5f + noise.cnoise(new float2(cX, cY)) * .5f) * scale;
         }
     }
 

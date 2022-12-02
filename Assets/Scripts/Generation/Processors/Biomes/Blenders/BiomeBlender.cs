@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Generation.Generators.Helpers;
+using Generation.Processors.Biomes.Generators;
 using JUtils.Attributes;
+using JUtils.Extensions;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
@@ -22,6 +24,7 @@ namespace Generation.Processors.Biomes.Blenders
         [Header("Perlin noise smoothing")]
         [SerializeField] private float _smoothingFrequency;
         [SerializeField] private float _smoothingScale;
+        [SerializeField] private CalculationType _calculation;
         
         [Space, Space]
         [SerializeField] private SetupData[] _processors;
@@ -81,7 +84,8 @@ namespace Generation.Processors.Biomes.Blenders
                     chunkX = x,
                     chunkZ = z,
                     smoothingFrequency = _smoothingFrequency,
-                    smoothingScale = _smoothingScale,
+                    smoothingScale     = _smoothingScale,
+                    calculation        = _calculation,
                     
                     subGenerators = _processors.Select(t => new BiomeBlendData
                     {
@@ -102,6 +106,7 @@ namespace Generation.Processors.Biomes.Blenders
                     
                     smoothingFrequency = _smoothingFrequency,
                     smoothingScale     = _smoothingScale,
+                    calculation        = _calculation,
                     
                     subGenerators = _processors.Select(t => new BiomeBlendData
                     {
@@ -125,7 +130,21 @@ namespace Generation.Processors.Biomes.Blenders
             public BiomeBlendData[] subGenerators;
 
             public float smoothingFrequency, smoothingScale;
+            public CalculationType calculation;
+            
             public float chunkX, chunkZ;
+
+
+            public float ApplyCalculation(float x)
+            {
+                return calculation switch
+                {
+                    CalculationType.Linier => x,
+                    CalculationType.Quadratic => x * x,
+                    CalculationType.Root => math.sqrt(x),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
 
 
             public int SampleMapPoint(int x, int z)
@@ -153,9 +172,9 @@ namespace Generation.Processors.Biomes.Blenders
                         continue;
                     }
 
-                    float point = math.clamp(noise.cnoise(new float2((x + chunkX)*smoothingFrequency, (z + chunkZ)*smoothingFrequency)),0,1);
+                    float point = math.clamp(.5f+noise.cnoise(new float2((x + chunkX)*smoothingFrequency, (z + chunkZ)*smoothingFrequency))*.5f,0,1);
 
-                    float weight     = (value - minHeight) / smoothing;
+                    float weight     = ApplyCalculation((value - minHeight) / smoothing);
                     float baseWeight = (1 - math.pow(2* weight-1, 2))*smoothingScale;
                     float multi      = weight * (1-baseWeight) + point * baseWeight;
                     

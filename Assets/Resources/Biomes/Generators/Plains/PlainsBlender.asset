@@ -16,16 +16,17 @@ MonoBehaviour:
   _randomOctaves:
     octaves:
     - scale: 1
-      frequency: 0.0078125
+      frequency: 0.005859375
       offsetX: 234
       offsetY: 0
       offsetZ: -2462
-  _smoothingFrequency: 0.0625
-  _smoothingScale: 0.1
+  _smoothingFrequency: 0.05
+  _smoothingScale: 0.5
+  _calculation: 1
   _processors:
   - processor: {fileID: 11400000, guid: 6e03e312f30922548a93d703fbd4cb4e, type: 2}
     heightValue: 0
     smoothing: 0
   - processor: {fileID: 11400000, guid: de904f56e4a455748b28bab7e30e6016, type: 2}
     heightValue: 0.7
-    smoothing: 0.1
+    smoothing: 0.2

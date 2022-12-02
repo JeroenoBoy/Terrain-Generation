@@ -12,57 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34096251e0934eca90df12b10dd30d11, type: 3}
   m_Name: MountainBiome
   m_EditorClassIdentifier: 
-  _continentalnessCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0.0010147095
-      value: 0
-      inSlope: 87.373856
-      outSlope: 87.373856
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.4369533
-    - serializedVersion: 3
-      time: 0.19282445
-      value: 22.745974
-      inSlope: 142.50748
-      outSlope: 142.50748
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.31168425
-      outWeight: 0.13214235
-    - serializedVersion: 3
-      time: 0.4783674
-      value: 65.49723
-      inSlope: 183.05724
-      outSlope: 183.05724
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.11642888
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.7114088
-      value: 90.22683
-      inSlope: 137.12704
-      outSlope: 137.12704
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 150
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  _minContinentalnessHeight: 0
+  _maxContinentalnessHeight: 100
+  _calculation: 0
+  _3dNoiseTopFalloff: 0.03125
+  _3dNoiseBottomFalloff: 0.0625
+  _3dNoiseFrequency: 0.03125
+  _3dNoiseMargin: 0.8
   _octaves:
     octaves:
     - scale: 20

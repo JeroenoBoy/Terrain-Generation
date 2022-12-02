@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,8 @@ namespace Generation.Generators
         
         private int  _activeGenerators;
         private List<int2> _chunksToCreate;
+
+        private readonly List<Thread> _activeThreads = new ();
 
 
         private void Start()
@@ -90,14 +93,25 @@ namespace Generation.Generators
             CreateChunkJob job = GetCreateChunkJob(x, z);
 
             Thread thread = new (job.Execute);
+            _activeThreads.Add(thread);
             thread.Start();
             yield return new WaitWhile(() => thread.IsAlive);
-        
+            _activeThreads.Remove(thread);
+            
             //  Creating chunk
         
             CreateChunk(job);
             _activeGenerators--;
             _chunksToCreate.Remove(chunkPos);
+        }
+
+
+        
+        private void OnDestroy()
+        {
+            foreach (Thread activeThread in _activeThreads) {
+                activeThread.Abort();
+            }
         }
     }
 }

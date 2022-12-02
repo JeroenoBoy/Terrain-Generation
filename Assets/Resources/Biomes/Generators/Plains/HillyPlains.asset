@@ -17,7 +17,7 @@ MonoBehaviour:
     - scale: 15
       frequency: 0.0625
       offsetX: -342
-      offsetY: 15
+      offsetY: 25
       offsetZ: 343
     - scale: 15
       frequency: 0.0625
