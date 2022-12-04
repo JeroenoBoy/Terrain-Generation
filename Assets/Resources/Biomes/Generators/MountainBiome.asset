@@ -15,10 +15,6 @@ MonoBehaviour:
   _minContinentalnessHeight: 0
   _maxContinentalnessHeight: 100
   _calculation: 0
-  _3dNoiseTopFalloff: 0.03125
-  _3dNoiseBottomFalloff: 0.0625
-  _3dNoiseFrequency: 0.03125
-  _3dNoiseMargin: 0.8
   _octaves:
     octaves:
     - scale: 20
